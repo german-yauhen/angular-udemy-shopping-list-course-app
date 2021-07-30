@@ -22,6 +22,15 @@ export class ShoppingListService {
     } else {
       this.ingredients.push(newIngredient);
     }
+    this.emitIngredientChanged();
+  }
+
+  addNewIngredients(ingredients: Ingredient[]): void {
+    this.ingredients.push(...ingredients);
+    this.emitIngredientChanged();
+  }
+
+  private emitIngredientChanged(): void {
     this.ingredientChanged.emit(this.getIngredientsCopy());
   }
 
