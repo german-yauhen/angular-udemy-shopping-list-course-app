@@ -1,0 +1,8 @@
+<div class="container">
+  <div class="row">
+    <p *ngIf="editMode;else isNotEditMode">Editing the recipe #{{ recipeId }}</p>
+    <ng-template #isNotEditMode>
+      <p>Creating new recipe</p>
+    </ng-template>
+  </div>
+</div>

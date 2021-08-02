@@ -8,6 +8,7 @@ export class RecipeService {
 
   private recipes: Recipe[] = [
     new Recipe(
+      1,
       'Pineapple cake',
       'Summer garden fruits in a sweet glazed cream',
       'https://images.freeimages.com/images/large-previews/b89/summer-garden-fruits-in-a-sweet-glazed-cream-pie-dessert-1632381.jpg',
@@ -18,6 +19,7 @@ export class RecipeService {
     ),
 
     new Recipe(
+      2,
       'Apple pie',
       'Apple pie with almonds',
       'https://images.freeimages.com/images/large-previews/815/apple-pie-with-almonds-1318484.jpg',
@@ -42,6 +44,10 @@ export class RecipeService {
         this.shoppingListService.addNewIngredient(ingredient);
       })
     }
+  }
+
+  getRecipe(id: number): Recipe {
+    return this.recipes.find(recipe => recipe.id === id);
   }
 
 }
