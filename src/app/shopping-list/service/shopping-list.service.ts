@@ -7,6 +7,8 @@ export class ShoppingListService {
   // ingredientChanged: EventEmitter<Ingredient[]> = new EventEmitter<Ingredient[]>();
   ingredientChanged: Subject<Ingredient[]> = new Subject<Ingredient[]>();
 
+  startedEditing: Subject<number> = new Subject<number>();
+
   private ingredients: Ingredient[] = [
     new Ingredient('Apple', 3),
     new Ingredient('Pineapple', 2),
@@ -15,6 +17,10 @@ export class ShoppingListService {
 
   getIngredients(): Ingredient[] {
     return this.getIngredientsCopy();
+  }
+
+  getIngredient(index: number): Ingredient {
+    return this.ingredients[index];
   }
 
   addNewIngredient(newIngredient: Ingredient): void {
@@ -30,6 +36,11 @@ export class ShoppingListService {
   addNewIngredients(ingredients: Ingredient[]): void {
     this.ingredients.push(...ingredients);
     this.emitIngredientChanged();
+  }
+
+  deleteIngredient(index: number): void {
+    this.ingredients.splice(index, 1);
+    this.ingredientChanged.next(this.getIngredientsCopy());
   }
 
   private emitIngredientChanged(): void {
