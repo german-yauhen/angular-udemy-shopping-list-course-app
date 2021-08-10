@@ -4,6 +4,15 @@
 
       <div class="row">
         <div class="col-xs-12">
+          <button type="submit" class="btn btn-success" [disabled]="recipeForm.invalid">Submit</button>
+          <button type="button" class="btn btn-danger">Cancel</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col-xs-12">
           <div class="form-group">
             <label for="name">Name</label>
             <input type="text" id="name" formControlName="recipeName" class="form-control">
@@ -37,7 +46,9 @@
 
       <div class="row">
         <div class="col-xs-12" formArrayName="recipeIngredients">
-          <div class="row" *ngFor="let ingredientControl of getIngredientsControls(); let indx = index" [formGroupName]="indx">
+          <div class="row"
+            *ngFor="let ingredientControl of getIngredientsControls(); let indx = index"
+            [formGroupName]="indx" style="margin-top: 10px;">
 
             <div class="col-xs-8">
               <input type="text" class="form-control" formControlName="ingredientName">
@@ -52,15 +63,13 @@
             </div>
 
           </div>
-        </div>
-      </div>
 
-      <hr>
+          <div class="row" style="margin-top: 10px;">
+            <div class="col-xs-12">
+              <button type="button" class="btn btn-success" (click)="onAddIngredient()">Add ingredient</button>
+            </div>
+          </div>
 
-      <div class="row">
-        <div class="col-xs-12">
-          <button type="submit" class="btn btn-success">Submit</button>
-          <button type="button" class="btn btn-danger">Cancel</button>
         </div>
       </div>
 
