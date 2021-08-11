@@ -61,21 +61,34 @@ export class RecipeService {
 
   addRecipe(recipe: Recipe): void {
     this.recipes.push(recipe);
-    this.notidyRecipesChanged();
+    this.notifyRecipesChanged();
   }
 
   updateRecipe(recipeUpd: Recipe): void {
+    const foundIndex: number = this.findRecipeIndex(recipeUpd.id);
+    this.recipes[foundIndex] = recipeUpd;
+    this.notifyRecipesChanged();
+  }
+
+  deleteRecipe(recipeId: number): void {
+    const foundIndex: number = this.findRecipeIndex(recipeId);
+    this.recipes.splice(foundIndex, 1);
+    this.notifyRecipesChanged();
+  }
+
+  private findRecipeIndex(recipeId: number): number {
+    let found: number;
     for (let index = 0; index < this.recipes.length; index++) {
       const recipe: Recipe = this.recipes[index];
-      if (recipeUpd.id === recipe.id) {
-        this.recipes[index] = recipeUpd;
+      if (recipeId === recipe.id) {
+        found = index;
         break;
       }
     }
-    this.notidyRecipesChanged();
+    return found;
   }
 
-  private notidyRecipesChanged(): void {
+  private notifyRecipesChanged(): void {
     this.recipesChanged.next(this.getRecipes());
   }
 
