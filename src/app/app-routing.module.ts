@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { AuthComponent } from "./auth/auth.component";
 import { NotFoundComponent } from "./not-found/not-found.component";
 import { RecipeContentComponent } from "./recipes/recipe-content/recipe-content.component";
 import { RecipeDetailComponent } from "./recipes/recipe-detail/recipe-detail.component";
@@ -20,6 +21,7 @@ const routes: Routes = [
     ]
   },
   { path: 'shopping-list', component: ShoppingListComponent },
+  { path: 'auth', component: AuthComponent },
   { path: 'not-found', component: NotFoundComponent, data: {errorMessage: '404: The requested page is not found!'} },
   { path: '**', redirectTo: '/not-found' }
 ]

@@ -18,6 +18,8 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { RecipeContentComponent } from './recipes/recipe-content/recipe-content.component';
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
 import { RecipeService } from './recipes/service/recipe.service';
+import { AuthComponent } from './auth/auth.component';
+import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { RecipeService } from './recipes/service/recipe.service';
     DropdownDirective,
     NotFoundComponent,
     RecipeContentComponent,
-    RecipeEditComponent
+    RecipeEditComponent,
+    AuthComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     BrowserModule,

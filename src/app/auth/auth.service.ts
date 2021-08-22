@@ -1,0 +1,85 @@
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable, Subject, throwError } from "rxjs";
+import { catchError, tap } from "rxjs/operators";
+import { User } from "./user.model";
+
+export interface AuthResponse {
+  idToken: string;
+  email: string;
+  refreshToken: string;
+  expiresIn: string;
+  localId: string;
+  registered?: boolean;
+}
+
+@Injectable({providedIn: 'root'})
+export class AuthService {
+
+  user: Subject<User> = new Subject<User>();
+
+  constructor(private httpClient: HttpClient) {}
+
+  signUp(email: string, password: string): Observable<AuthResponse> {
+    return this.httpClient
+      .post<AuthResponse>(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDNrwYWXtTFXSY6rucPFQK1kZnD5c5kX1M',
+        {
+          email: email,
+          password: password,
+          returnSecureToken: true
+        }
+      ).pipe(
+        tap(responseData => {
+          this.handleAuthentication(
+            responseData.email, responseData.localId, responseData.idToken, Number.parseInt(responseData.expiresIn)
+          );
+        }),
+        catchError(errorResponse => {
+          return throwError(this.handleErrorMessage(errorResponse));
+        })
+      );
+  }
+
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDNrwYWXtTFXSY6rucPFQK1kZnD5c5kX1M',
+      {
+        email: email,
+        password: password,
+        returnSecureToken: true
+      }
+    ).pipe(
+      tap(responseData => {
+        this.handleAuthentication(
+          responseData.email, responseData.localId, responseData.idToken, Number.parseInt(responseData.expiresIn)
+        );
+      }),
+      catchError(errorResponse => {
+        return throwError(this.handleErrorMessage(errorResponse));
+      })
+    );
+  }
+
+  private handleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
+    const expirationDate: Date = new Date(new Date().getTime() + (expiresIn * 1000));
+    const newUser: User = new User(email, userId, token, expirationDate);
+    this.user.next(newUser);
+  }
+
+  private handleErrorMessage(errorResponse: HttpErrorResponse): string {
+    if (!errorResponse.error || !errorResponse.error.error) {
+      return 'An unknown error occurred!';
+    }
+    switch (errorResponse.error.error.message) {
+      case 'EMAIL_EXISTS': return 'The email address is already in use by another account';
+      case 'OPERATION_NOT_ALLOWED': return 'Password sign-in is disabled for this project';
+      case 'TOO_MANY_ATTEMPTS_TRY_LATER': return 'We have blocked all requests from this device due to unusual activity. Try again later';
+
+      case 'EMAIL_NOT_FOUND': return 'There is no user associated with provided email address. The user may have been deleted';
+      case 'INVALID_PASSWORD': return 'The password is invalid or the user does not have a password';
+      case 'USER_DISABLED': return 'The user account has been disabled by an administrator';
+    }
+  }
+
+}
