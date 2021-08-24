@@ -3,11 +3,13 @@ import { Injectable } from "@angular/core";
 import { Recipe } from "../recipes/recipe.model";
 import { RecipeService } from "../recipes/service/recipe.service";
 import { map, tap } from "rxjs/operators"
+import { AuthService } from "../auth/auth.service";
+import { Observable } from "rxjs";
 
 @Injectable({providedIn: 'root'})
 export class DataStorageService {
 
-  constructor(private httpClient: HttpClient, private recipeService: RecipeService) {}
+  constructor(private httpClient: HttpClient, private recipeService: RecipeService, private authService: AuthService) {}
 
   storeRecipes() {
     const recipes: Recipe[] = this.recipeService.getRecipes();
@@ -28,7 +30,7 @@ export class DataStorageService {
   //   });
   // }
 
-  fetchRecipes() {
+  fetchRecipes(): Observable<Recipe[]> {
     return this.httpClient
       .get<Recipe[]>('https://eugenes-ng-course-recipe-book-default-rtdb.firebaseio.com/recipes.json')
       .pipe(
