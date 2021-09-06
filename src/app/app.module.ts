@@ -10,10 +10,7 @@ import { HeaderComponent } from './header/header.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { RecipesModule } from "./recipes/recipes.module";
 import { RecipeService } from './recipes/service/recipe.service';
-import { AlertComponent } from './shared/alert/alert.component';
-import { DropdownDirective } from './shared/directive/dropdown.directive';
-import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
-import { PlaceholderDirective } from './shared/placeholder/placeholder.directive';
+import { SharedModule } from "./shared/shared.module";
 import { ShoppingListService } from './shopping-list/service/shopping-list.service';
 import { ShoppingListModule } from "./shopping-list/shopping-list.module";
 
@@ -22,12 +19,8 @@ import { ShoppingListModule } from "./shopping-list/shopping-list.module";
   declarations: [
     AppComponent,
     HeaderComponent,
-    DropdownDirective,
     NotFoundComponent,
-    AuthComponent,
-    LoadingSpinnerComponent,
-    AlertComponent,
-    PlaceholderDirective
+    AuthComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +29,8 @@ import { ShoppingListModule } from "./shopping-list/shopping-list.module";
     ReactiveFormsModule,
     HttpClientModule,
     RecipesModule,
-    ShoppingListModule
+    ShoppingListModule,
+    SharedModule
   ],
   providers: [
     ShoppingListService,
