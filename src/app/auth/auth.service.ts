@@ -26,7 +26,7 @@ export class AuthService {
   signUp(email: string, password: string): Observable<AuthResponse> {
     return this.httpClient
       .post<AuthResponse>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=',
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDNrwYWXtTFXSY6rucPFQK1kZnD5c5kX1M',
         {
           email: email,
           password: password,
@@ -46,7 +46,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=',
+      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDNrwYWXtTFXSY6rucPFQK1kZnD5c5kX1M',
       {
         email: email,
         password: password,
