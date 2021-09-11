@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { AuthComponent } from './auth/auth.component';
+import { AuthModule } from "./auth/auth.module";
 import { HeaderComponent } from './header/header.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { RecipesModule } from "./recipes/recipes.module";
@@ -19,18 +20,17 @@ import { ShoppingListModule } from "./shopping-list/shopping-list.module";
   declarations: [
     AppComponent,
     HeaderComponent,
-    NotFoundComponent,
-    AuthComponent
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
-    FormsModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
     RecipesModule,
     ShoppingListModule,
-    SharedModule
+    SharedModule,
+    AuthModule
   ],
   providers: [
     ShoppingListService,
