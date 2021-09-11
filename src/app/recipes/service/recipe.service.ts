@@ -47,11 +47,14 @@ export class RecipeService {
   }
 
   generateId(): number {
+    if (this.recipes.length == 0) {
+      return 1;
+    }
     const ids: number[] = [];
     for (const recipe of this.recipes) {
       ids.push(recipe.id);
     }
-    return (Math.max(...ids) + 1);
+    return Math.max(...ids) + 1;
   }
 
   addIngredientsToShoppingList(ingredients: Ingredient[]): void {
