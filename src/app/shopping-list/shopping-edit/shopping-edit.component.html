@@ -4,7 +4,7 @@
       #ingredientForm -> local reference to the form, it gives us access to the form itself
       #ingredientForm="ngForm" -> getting access to the javascript object that angular creates behind the scenes
      -->
-    <form (ngSubmit)="onAddIngredient(ingredientForm)" #ingredientForm="ngForm">
+    <form (ngSubmit)="onAddOrUpdateIngredient(ingredientForm)" #ingredientForm="ngForm">
       <div class="col-sm-5 form-group">
         <label for="name">Name</label>
         <input type="text" id="name" name="ingredientName" ngModel class="form-control" required>
@@ -20,7 +20,7 @@
 
       <div class="row">
         <div class="col-xs-12">
-          <button class="btn btn-success" type="submit" [disabled]="ingredientForm.invalid">Add</button>
+          <button class="btn btn-success" type="submit" [disabled]="ingredientForm.invalid">{{ edittingMode ? 'Update' : 'Add' }}</button>
           <button class="btn btn-danger" type="button" (click)="onDeleteIngredient()" *ngIf="edittingMode">Delete</button>
           <button class="btn btn-primary" type="button" (click)="onClearForm()">Clear</button>
         </div>

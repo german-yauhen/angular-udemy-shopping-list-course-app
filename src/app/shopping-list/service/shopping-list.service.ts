@@ -1,58 +1,45 @@
-// import { EventEmitter } from "@angular/core";
+import { Injectable } from "@angular/core";
+import { Action, Store } from "@ngrx/store";
 import { Subject } from "rxjs";
 import { Ingredient } from "src/app/shared/ingredient.model";
+import * as ShoppingListActions from "../store/shopping-list-actions";
 
+@Injectable()
 export class ShoppingListService {
 
-  // ingredientChanged: EventEmitter<Ingredient[]> = new EventEmitter<Ingredient[]>();
   ingredientChanged: Subject<Ingredient[]> = new Subject<Ingredient[]>();
 
   startedEditing: Subject<number> = new Subject<number>();
 
-  private ingredients: Ingredient[] = [
-    new Ingredient('Apple', 3),
-    new Ingredient('Pineapple', 2),
-    new Ingredient('Diamond milk', 500)
-  ];
-
-  getIngredients(): Ingredient[] {
-    return this.getIngredientsCopy();
-  }
+  constructor(private store: Store<{ shoppingList: { ingredients: Ingredient[] } }>) {}
 
   getIngredient(index: number): Ingredient {
-    return this.ingredients[index];
+    let ingredient: Ingredient;
+    this.store.select('shoppingList').subscribe(payload => {
+      ingredient = payload.ingredients[index];
+    })
+    return ingredient;
   }
 
-  addNewIngredient(newIngredient: Ingredient): void {
-    const existedIngredient: Ingredient = this.getIngredientByName(newIngredient.name);
-    if (existedIngredient) {
-      existedIngredient.amount = existedIngredient.amount + newIngredient.amount;
-    } else {
-      this.ingredients.push(newIngredient);
-    }
-    this.emitIngredientChanged();
-  }
-
-  addNewIngredients(ingredients: Ingredient[]): void {
-    this.ingredients.push(...ingredients);
-    this.emitIngredientChanged();
+  addOrUpdateIngredient(ingredient: Ingredient): void {
+    const existingIngredient: Ingredient = this.findIngredient(ingredient.name);
+    const action: Action = existingIngredient
+      ? new ShoppingListActions.UpdateIngredient(ingredient)
+      : new ShoppingListActions.AddIngredient(ingredient);
+    this.store.dispatch(action);
   }
 
   deleteIngredient(index: number): void {
-    this.ingredients.splice(index, 1);
-    this.ingredientChanged.next(this.getIngredientsCopy());
+    const ingredient: Ingredient = this.getIngredient(index);
+    this.store.dispatch(new ShoppingListActions.DeleteIngredient(ingredient));
   }
 
-  private emitIngredientChanged(): void {
-    this.ingredientChanged.next(this.getIngredientsCopy());
-  }
-
-  private getIngredientsCopy(): Ingredient[] {
-    return this.ingredients.slice();
-  }
-
-  private getIngredientByName(name: string): Ingredient {
-    return this.ingredients.find(ingredient => ingredient.name.toUpperCase() === name.toUpperCase());
+  private findIngredient(name: string): Ingredient {
+    let found: Ingredient;
+    this.store.select('shoppingList').subscribe(payload => {
+      found = payload.ingredients.find(ingr => ingr.name.toUpperCase() === name.toUpperCase());
+    });
+    return found;
   }
 
 }
