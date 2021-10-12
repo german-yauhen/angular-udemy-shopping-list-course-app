@@ -4,13 +4,14 @@ import { Observable, Subject } from "rxjs";
 import { Ingredient } from "src/app/shared/ingredient.model";
 import * as ShoppingListActions from "../store/shopping-list-actions";
 import * as fromShoppingList from "../store/shopping-list.reducer";
+import * as fromApp from "../../store/app.reducer";
 
 @Injectable()
 export class ShoppingListService {
 
   startedEditing: Subject<string> = new Subject<string>();
 
-  constructor(private store: Store<fromShoppingList.AppState>) {}
+  constructor(private store: Store<fromApp.AppState>) {}
 
   addIngredient(ingredient: Ingredient): void {
     const existingIngredient: Ingredient = this.findIngredient(ingredient.name);
@@ -45,7 +46,7 @@ export class ShoppingListService {
     this.store.dispatch(new ShoppingListActions.StopEditIngredient());
   }
 
-  getShoppingListSate(): Observable<fromShoppingList.State> {
+  getShoppingListSate(): Observable<fromShoppingList.ShoppingListState> {
     return this.store.select('shoppingList');
   }
 

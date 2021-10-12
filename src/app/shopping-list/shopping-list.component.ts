@@ -10,7 +10,7 @@ import * as fromShoppingList from './store/shopping-list.reducer';
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
 
-  ingredientsObs: Observable<fromShoppingList.State>;
+  ingredientsObs: Observable<fromShoppingList.ShoppingListState>;
 
   constructor(private shoppingListService: ShoppingListService) {}
 
