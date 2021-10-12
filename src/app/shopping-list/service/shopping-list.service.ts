@@ -10,17 +10,9 @@ export class ShoppingListService {
 
   ingredientChanged: Subject<Ingredient[]> = new Subject<Ingredient[]>();
 
-  startedEditing: Subject<number> = new Subject<number>();
+  startedEditing: Subject<string> = new Subject<string>();
 
   constructor(private store: Store<fromShoppingList.AppState>) {}
-
-  getIngredient(index: number): Ingredient {
-    let ingredient: Ingredient;
-    this.store.select('shoppingList').subscribe(payload => {
-      ingredient = payload.ingredients[index];
-    })
-    return ingredient;
-  }
 
   addOrUpdateIngredient(ingredient: Ingredient): void {
     const existingIngredient: Ingredient = this.findIngredient(ingredient.name);
@@ -30,12 +22,12 @@ export class ShoppingListService {
     this.store.dispatch(action);
   }
 
-  deleteIngredient(index: number): void {
-    const ingredient: Ingredient = this.getIngredient(index);
+  deleteIngredient(ingredientName: string): void {
+    const ingredient: Ingredient = this.findIngredient(ingredientName);
     this.store.dispatch(new ShoppingListActions.DeleteIngredient(ingredient));
   }
 
-  private findIngredient(name: string): Ingredient {
+  findIngredient(name: string): Ingredient {
     let found: Ingredient;
     this.store.select('shoppingList').subscribe(payload => {
       found = payload.ingredients.find(ingr => ingr.name.toUpperCase() === name.toUpperCase());

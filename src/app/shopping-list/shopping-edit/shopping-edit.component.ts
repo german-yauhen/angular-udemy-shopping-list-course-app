@@ -17,17 +17,17 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   edittingMode: boolean = false;
 
   subscription: Subscription;
-  edittingIngredientIndex: number;
+  edittingIngredientName: string;
   edittingIngredient: Ingredient;
 
   constructor(private shoppingListService: ShoppingListService) {}
 
   ngOnInit(): void {
     this.subscription = this.shoppingListService.startedEditing.subscribe(
-      (index: number) => {
+      (ingredientName: string) => {
         this.edittingMode = true;
-        this.edittingIngredientIndex = index;
-        this.edittingIngredient = this.shoppingListService.getIngredient(index);
+        this.edittingIngredientName = ingredientName;
+        this.edittingIngredient = this.shoppingListService.findIngredient(ingredientName);
         this.ingredientForm.setValue({
           ingredientName: this.edittingIngredient.name,
           ingredientAmount: this.edittingIngredient.amount
@@ -55,7 +55,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   }
 
   onDeleteIngredient(): void {
-    this.shoppingListService.deleteIngredient(this.edittingIngredientIndex);
+    this.shoppingListService.deleteIngredient(this.edittingIngredientName);
     this.onClearForm();
   }
 
