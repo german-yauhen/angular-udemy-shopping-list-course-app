@@ -1,14 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Action, Store } from "@ngrx/store";
-import { Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { Ingredient } from "src/app/shared/ingredient.model";
 import * as ShoppingListActions from "../store/shopping-list-actions";
 import * as fromShoppingList from "../store/shopping-list.reducer";
 
 @Injectable()
 export class ShoppingListService {
-
-  ingredientChanged: Subject<Ingredient[]> = new Subject<Ingredient[]>();
 
   startedEditing: Subject<string> = new Subject<string>();
 
@@ -33,6 +31,18 @@ export class ShoppingListService {
       found = payload.ingredients.find(ingr => ingr.name.toUpperCase() === name.toUpperCase());
     });
     return found;
+  }
+
+  startEditingIngredient(name: string): void {
+    this.store.dispatch(new ShoppingListActions.StartEditIngredient(name));
+  }
+
+  stopEditingIngredient(): void {
+    this.store.dispatch(new ShoppingListActions.StopEditIngredient());
+  }
+
+  getShoppingListSate(): Observable<fromShoppingList.State> {
+    return this.store.select('shoppingList');
   }
 
 }
