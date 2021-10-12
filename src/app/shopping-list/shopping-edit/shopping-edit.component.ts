@@ -17,7 +17,6 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   edittingMode: boolean = false;
 
   subscription: Subscription;
-  edittingIngredientName: string;
   edittingIngredient: Ingredient;
 
   constructor(private shoppingListService: ShoppingListService) {}
@@ -26,8 +25,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     this.subscription = this.shoppingListService.getShoppingListSate().subscribe(stateData => {
       if (stateData.editingIngredientName) {
         this.edittingMode = true;
-        this.edittingIngredientName = stateData.editingIngredientName;
-        this.edittingIngredient = this.shoppingListService.findIngredient(this.edittingIngredientName);
+        this.edittingIngredient = stateData.editingIngredient;
         this.ingredientForm.setValue({
           ingredientName: this.edittingIngredient.name,
           ingredientAmount: this.edittingIngredient.amount
@@ -48,7 +46,11 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
       ingredientForm.value.ingredientName,
       Number.parseInt(ingredientForm.value.ingredientAmount)
     );
-    this.shoppingListService.addOrUpdateIngredient(ingredient);
+    if (this.edittingMode) {
+      this.shoppingListService.updateIngredient(ingredient);
+    } else {
+      this.shoppingListService.addIngredient(ingredient);
+    }
     this.onClearForm();
   }
 
@@ -59,7 +61,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   }
 
   onDeleteIngredient(): void {
-    this.shoppingListService.deleteIngredient(this.edittingIngredientName);
+    this.shoppingListService.deleteIngredient();
     this.onClearForm();
   }
 

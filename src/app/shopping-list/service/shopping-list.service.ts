@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Action, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { Observable, Subject } from "rxjs";
 import { Ingredient } from "src/app/shared/ingredient.model";
 import * as ShoppingListActions from "../store/shopping-list-actions";
@@ -12,17 +12,21 @@ export class ShoppingListService {
 
   constructor(private store: Store<fromShoppingList.AppState>) {}
 
-  addOrUpdateIngredient(ingredient: Ingredient): void {
+  addIngredient(ingredient: Ingredient): void {
     const existingIngredient: Ingredient = this.findIngredient(ingredient.name);
-    const action: Action = existingIngredient
-      ? new ShoppingListActions.UpdateIngredient(ingredient)
-      : new ShoppingListActions.AddIngredient(ingredient);
-    this.store.dispatch(action);
+    if (existingIngredient) {
+      this.updateIngredient(new Ingredient(existingIngredient.name, existingIngredient.amount + ingredient.amount));
+    } else {
+      this.store.dispatch(new ShoppingListActions.AddIngredient(ingredient));
+    }
   }
 
-  deleteIngredient(ingredientName: string): void {
-    const ingredient: Ingredient = this.findIngredient(ingredientName);
-    this.store.dispatch(new ShoppingListActions.DeleteIngredient(ingredient));
+  updateIngredient(ingredient: Ingredient): void {
+    this.store.dispatch(new ShoppingListActions.UpdateIngredient(ingredient));
+  }
+
+  deleteIngredient(): void {
+    this.store.dispatch(new ShoppingListActions.DeleteIngredient());
   }
 
   findIngredient(name: string): Ingredient {

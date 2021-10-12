@@ -66,7 +66,7 @@ export function shoppingListReducer(state = initialState, action: ShoppingListAc
     case ShoppingListActions.DELETE_INGREDIENT:
       return {
         ...state,
-        ingredients: state.ingredients.filter(ingr => ingr.name !== action.payload.name)
+        ingredients: state.ingredients.filter(ingr => ingr.name.toUpperCase() !== state.editingIngredientName.toUpperCase())
       }
 
     case ShoppingListActions.START_EDIT_INGREDIENT:
