@@ -32,7 +32,7 @@ export function shoppingListReducer(state = initialState, action: ShoppingListAc
     case ShoppingListActions.ADD_INGREDIENTS:
       return {
         ...state,
-        ingredients: [...state.ingredients, ...action.payload]
+        ingredients: concatWithState(state.ingredients, action.payload)
       };
 
     case ShoppingListActions.UPDATE_INGREDIENT:
@@ -42,7 +42,7 @@ export function shoppingListReducer(state = initialState, action: ShoppingListAc
       let ingredientForUpd: Ingredient;
 
       for (let index = 0; index < state.ingredients.length; index++) {
-        const ingredient = state.ingredients[index];
+        const ingredient: Ingredient = state.ingredients[index];
         if (ingredientName === ingredient.name.toUpperCase()) {
           ingredientForUpdIndx = index;
           ingredientForUpd = ingredient;
@@ -88,5 +88,18 @@ export function shoppingListReducer(state = initialState, action: ShoppingListAc
 }
 
 function findIngredient(name: string, ingredients: Ingredient[]): Ingredient {
-  return ingredients.find(ingredient => ingredient.name.toUpperCase() === name);
+  return ingredients.find(ingredient => ingredient.name.toUpperCase() === name.toUpperCase());
+}
+
+function concatWithState(stateIngredients: Ingredient[], payloadIngredients: Ingredient[]): Ingredient[] {
+  const ingredients: Ingredient[] = [];
+  payloadIngredients.forEach(payloadIngredient => {
+    const existedIngredient: Ingredient = findIngredient(payloadIngredient.name, stateIngredients);
+    if (existedIngredient) {
+      ingredients.push(new Ingredient(payloadIngredient.name, existedIngredient.amount + payloadIngredient.amount))
+    } else {
+      ingredients.push(payloadIngredient);
+    }
+  });
+  return ingredients;
 }
