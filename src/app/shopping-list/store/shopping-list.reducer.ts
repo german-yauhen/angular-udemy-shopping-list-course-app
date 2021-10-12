@@ -1,6 +1,14 @@
 import { Ingredient } from "src/app/shared/ingredient.model";
 import * as ShoppingListActions from "./shopping-list-actions";
 
+export interface State {
+  ingredients: Ingredient[];
+}
+
+export interface AppState {
+  shoppingList: State;
+}
+
 const initialState = {
   ingredients: [
     new Ingredient('Apple', 3),

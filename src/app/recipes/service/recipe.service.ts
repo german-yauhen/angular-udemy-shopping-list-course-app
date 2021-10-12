@@ -4,6 +4,7 @@ import { Subject } from "rxjs";
 import { Ingredient } from "src/app/shared/ingredient.model";
 import { Recipe } from "../recipe.model";
 import * as ShoppingListActions from "../../shopping-list/store/shopping-list-actions";
+import * as fromShoppingList from "../../shopping-list/store/shopping-list.reducer";
 
 @Injectable()
 export class RecipeService {
@@ -12,7 +13,7 @@ export class RecipeService {
 
   private recipes: Recipe[] = [];
 
-  constructor(private store: Store<{ shoppingList: { ingredients: Ingredient[] } }>) {}
+  constructor(private store: Store<fromShoppingList.AppState>) {}
 
   getRecipes(): Recipe[] {
     return this.recipes.slice(); // The aim is to return the copy of the recipes in order to prevent changing it out of this service
