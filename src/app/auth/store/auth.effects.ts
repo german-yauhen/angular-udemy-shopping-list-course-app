@@ -1,10 +1,10 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Actions, createEffect, Effect, ofType } from "@ngrx/effects";
-import { Observable, of } from "rxjs";
+import { of } from "rxjs";
 import { catchError, map, switchMap, tap } from "rxjs/operators";
-import { apikey } from "../sec.key";
+import { AuthService } from "../auth.service";
 
 import * as AuthActions from './auth.actions';
 
@@ -20,16 +20,18 @@ export interface AuthResponse {
 @Injectable()
 export class AuthEffects {
 
-  constructor(private actions: Actions, private httpClient: HttpClient, private router: Router) {}
+  constructor(private actions: Actions,
+     private router: Router,
+     private authService: AuthService) {}
 
-  @Effect()
+  @Effect({ dispatch: true })
   authLogin = this.actions.pipe(
     ofType(AuthActions.LOGIN_START),
     switchMap((authData: AuthActions.LoginStart) => {
-      return this.authorise(authData)
+      return this.authService.sendLoginRequest(authData.payload)
         .pipe(
           map(authResponse => this.convertToAuthActionLogin(authResponse)),
-          catchError(errorRs => of(new AuthActions.LoginFail(this.convertToErrorMessage(errorRs))))
+          catchError(errorRs => of(new AuthActions.AuthFail(this.convertToErrorMessage(errorRs))))
         )
     })
   );
@@ -38,6 +40,18 @@ export class AuthEffects {
   authSuccess = this.actions.pipe(
     ofType(AuthActions.LOGIN),
     tap(() => this.router.navigate(['/']))
+  );
+
+  @Effect({ dispatch: true })
+  signUpStart = this.actions.pipe(
+    ofType(AuthActions.SIGNUP_START),
+    switchMap((authData: AuthActions.SignUpStart) => {
+      return this.authService.sendSignUpRequest(authData.payload)
+        .pipe(
+          // map(authResponse => this.convertToAuthActionLogin(authResponse)),
+          // catchError(errorRs => of(new AuthActions.AuthFail(this.convertToErrorMessage(errorRs))))
+        )
+    })
   );
 
   // authLogin = createEffect(() => this.actions.pipe(
@@ -58,17 +72,6 @@ export class AuthEffects {
   //   ),
   //   { dispatch: false }
   // );
-
-  private authorise(authData: AuthActions.LoginStart): Observable<AuthResponse> {
-    return this.httpClient.post<AuthResponse>(
-      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + apikey,
-      {
-        email: authData.payload.email,
-        password: authData.payload.password,
-        returnSecureToken: true
-      }
-    )
-  }
 
   private convertToAuthActionLogin(rsData: AuthResponse): AuthActions.Login {
     const expirationDate: Date = new Date(new Date().getTime() + (Number.parseInt(rsData.expiresIn) * 1000));

@@ -28,15 +28,8 @@ export class AuthService {
   constructor(private httpClient: HttpClient, private router: Router, private appStore: Store<fromApp.AppState>) {}
 
   signUp(email: string, password: string): Observable<AuthResponse> {
-    return this.httpClient
-      .post<AuthResponse>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apikey,
-        {
-          email: email,
-          password: password,
-          returnSecureToken: true
-        }
-      ).pipe(
+    return this.sendSignUpRequest({ email: email, password: password })
+      .pipe(
         tap(responseData => {
           this.handleAuthentication(
             responseData.email, responseData.localId, responseData.idToken, Number.parseInt(responseData.expiresIn)
@@ -48,24 +41,39 @@ export class AuthService {
       );
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
+  // login(email: string, password: string): Observable<AuthResponse> {
+  //   return this.sendLoginRequest({email: email, password: password}).pipe(
+  //     tap(responseData => {
+  //       this.handleAuthentication(
+  //         responseData.email, responseData.localId, responseData.idToken, Number.parseInt(responseData.expiresIn)
+  //       );
+  //     }),
+  //     catchError(errorResponse => {
+  //       return throwError(this.handleErrorMessage(errorResponse));
+  //     })
+  //   );
+  // }
+
+  sendLoginRequest(loginData: { email: string; password: string }): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
       'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + apikey,
       {
-        email: email,
-        password: password,
+        email: loginData.email,
+        password: loginData.password,
         returnSecureToken: true
       }
-    ).pipe(
-      tap(responseData => {
-        this.handleAuthentication(
-          responseData.email, responseData.localId, responseData.idToken, Number.parseInt(responseData.expiresIn)
-        );
-      }),
-      catchError(errorResponse => {
-        return throwError(this.handleErrorMessage(errorResponse));
-      })
-    );
+    )
+  }
+
+  sendSignUpRequest(signUpData: { email: string; password: string; }): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apikey,
+      {
+        email: signUpData.email,
+        password: signUpData.password,
+        returnSecureToken: true
+      }
+    )
   }
 
   logout(): void {

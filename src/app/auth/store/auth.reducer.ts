@@ -40,7 +40,7 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
         authErrorMsg: null,
         loading: true
       };
-    case AuthActions.LOGIN_FAIL:
+    case AuthActions.AUTH_FAIL:
       return {
         ...state,
         user: null,
