@@ -34,13 +34,30 @@ export class AuthEffects {
     })
   );
 
-  authSuccess = createEffect(
-    () => this.actions.pipe(
-      ofType(AuthActions.LOGIN),
-      tap(() => this.router.navigate(['/']))
-    ),
-    { dispatch: false }
+  @Effect({ dispatch: false })
+  authSuccess = this.actions.pipe(
+    ofType(AuthActions.LOGIN),
+    tap(() => this.router.navigate(['/']))
   );
+
+  // authLogin = createEffect(() => this.actions.pipe(
+  //   ofType(AuthActions.LOGIN_START),
+  //   switchMap((authData: AuthActions.LoginStart) => {
+  //     return this.authorise(authData)
+  //       .pipe(
+  //         map(authResponse => this.convertToAuthActionLogin(authResponse)),
+  //         catchError(errorRs => of(new AuthActions.LoginFail(this.convertToErrorMessage(errorRs))))
+  //       )
+  //   })
+  // ));
+
+  // authSuccess = createEffect(
+  //   () => this.actions.pipe(
+  //     ofType(AuthActions.LOGIN),
+  //     tap(() => this.router.navigate(['/']))
+  //   ),
+  //   { dispatch: false }
+  // );
 
   private authorise(authData: AuthActions.LoginStart): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
