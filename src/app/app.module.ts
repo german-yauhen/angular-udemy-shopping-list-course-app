@@ -11,7 +11,9 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { RecipeService } from './recipes/service/recipe.service';
 import { SharedModule } from './shared/shared.module';
 import { ShoppingListService } from './shopping-list/service/shopping-list.service';
+import { EffectsModule } from '@ngrx/effects';
 import * as fromApp from './store/app.reducer';
+import { AuthEffects } from './auth/store/auth.effects';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,8 @@ import * as fromApp from './store/app.reducer';
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    SharedModule
+    SharedModule,
+    EffectsModule.forRoot([AuthEffects])
   ],
   providers: [
     ShoppingListService,
