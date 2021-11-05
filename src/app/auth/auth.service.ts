@@ -46,6 +46,30 @@ export class AuthService {
     )
   }
 
+  navigateLogout(): void {
+    this.router.navigate(['/auth']);
+  }
+
+  navigateLogin(): void {
+    this.router.navigate(['/'])
+  }
+
+  clearStorage(): void {
+    localStorage.removeItem('userData');
+  }
+
+  storeUser(user: User): void {
+    localStorage.setItem('userData', JSON.stringify(user));
+  }
+
+  readUser(): { email: string, id: string, _token: string, _tokenExpirationDate: string } {
+    const userData: string = localStorage.getItem('userData');
+    if (!userData) {
+      return null;
+    }
+    return JSON.parse(userData);
+  }
+
   logout(): void {
     this.appStore.dispatch(new AuthActions.Logout());
     this.router.navigate(['/auth']);
