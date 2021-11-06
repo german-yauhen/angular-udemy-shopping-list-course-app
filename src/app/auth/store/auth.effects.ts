@@ -50,7 +50,7 @@ export class AuthEffects {
   logout = this.actions.pipe(
     ofType(AuthActions.LOGOUT),
     tap(() => {
-      this.authService.clearStorage();
+      localStorage.removeItem('userData');
       this.authService.navigateLogout();
     })
   );
@@ -77,7 +77,7 @@ export class AuthEffects {
   private handleAuthFunc(rsData: AuthResponse): AuthActions.Login {
     const expirationDate: Date = new Date(new Date().getTime() + (Number.parseInt(rsData.expiresIn) * 1000));
     const newUser: User = new User(rsData.email, rsData.localId, rsData.idToken, expirationDate);
-    this.authService.storeUser(newUser);
+    localStorage.setItem('userData', JSON.stringify(newUser));
     return new AuthActions.Login(
       { email: rsData.email, userId: rsData.localId, token: rsData.idToken, expirationDate: expirationDate }
     );

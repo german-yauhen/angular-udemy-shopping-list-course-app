@@ -54,14 +54,6 @@ export class AuthService {
     this.router.navigate(['/'])
   }
 
-  clearStorage(): void {
-    localStorage.removeItem('userData');
-  }
-
-  storeUser(user: User): void {
-    localStorage.setItem('userData', JSON.stringify(user));
-  }
-
   readUser(): { email: string, id: string, _token: string, _tokenExpirationDate: string } {
     const userData: string = localStorage.getItem('userData');
     if (!userData) {
