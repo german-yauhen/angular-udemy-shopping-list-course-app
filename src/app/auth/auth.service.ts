@@ -4,7 +4,6 @@ import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { apikey } from "./sec.key";
-import { User } from "./user.model";
 import * as fromApp from "../store/app.reducer";
 import * as AuthActions from "./store/auth.actions";
 
@@ -54,50 +53,54 @@ export class AuthService {
     this.router.navigate(['/'])
   }
 
-  readUser(): { email: string, id: string, _token: string, _tokenExpirationDate: string } {
-    const userData: string = localStorage.getItem('userData');
-    if (!userData) {
-      return null;
-    }
-    return JSON.parse(userData);
+  setAutoLogoutTimer(expirationDurationMs: number): void {
+    this.tokenExpirationTimer = setTimeout(() => {
+      this.appStore.dispatch(new AuthActions.Logout())
+    }, expirationDurationMs);
   }
 
-  logout(): void {
-    this.appStore.dispatch(new AuthActions.Logout());
-    this.router.navigate(['/auth']);
-    localStorage.removeItem('userData');
+  clearAutoLogoutTimer(): void {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
     }
     this.tokenExpirationTimer = null;
   }
+  // logout(): void {
+  //   this.appStore.dispatch(new AuthActions.Logout());
+  //   this.router.navigate(['/auth']);
+  //   localStorage.removeItem('userData');
+    // if (this.tokenExpirationTimer) {
+    //   clearTimeout(this.tokenExpirationTimer);
+    // }
+    // this.tokenExpirationTimer = null;
+  // }
 
-  autoLogin(): void {
-    const userData: string = localStorage.getItem('userData');
-    if (!userData) {
-      return;
-    }
-    const userDataObj: {
-      email: string,
-      id: string,
-      _token: string,
-      _tokenExpirationDate: string
-    } = JSON.parse(userData);
-    const loadedUser: User = new User(userDataObj.email, userDataObj.id, userDataObj._token, new Date(userDataObj._tokenExpirationDate));
-    if (loadedUser.token) {
-      this.appStore.dispatch(new AuthActions.Login(
-        { email: loadedUser.email, userId: loadedUser.id, token: loadedUser.token, expirationDate: new Date(userDataObj._tokenExpirationDate) }
-      ));
-      const expirationDuration: number = new Date(userDataObj._tokenExpirationDate).getTime() - new Date().getTime();
-      this.autoLogout(expirationDuration);
-    }
-  }
+  // autoLogin(): void {
+  //   const userData: string = localStorage.getItem('userData');
+  //   if (!userData) {
+  //     return;
+  //   }
+  //   const userDataObj: {
+  //     email: string,
+  //     id: string,
+  //     _token: string,
+  //     _tokenExpirationDate: string
+  //   } = JSON.parse(userData);
+  //   const loadedUser: User = new User(userDataObj.email, userDataObj.id, userDataObj._token, new Date(userDataObj._tokenExpirationDate));
+  //   if (loadedUser.token) {
+  //     this.appStore.dispatch(new AuthActions.Login(
+  //       { email: loadedUser.email, userId: loadedUser.id, token: loadedUser.token, expirationDate: new Date(userDataObj._tokenExpirationDate) }
+  //     ));
+  //     const expirationDuration: number = new Date(userDataObj._tokenExpirationDate).getTime() - new Date().getTime();
+  //     this.autoLogout(expirationDuration);
+  //   }
+  // }
 
-  autoLogout(expirationDurationMs: number): void {
-    this.tokenExpirationTimer = setTimeout(() => {
-      this.logout();
-    }, expirationDurationMs);
-  }
+  // autoLogout(expirationDurationMs: number): void {
+  //   this.tokenExpirationTimer = setTimeout(() => {
+  //     this.logout();
+  //   }, expirationDurationMs);
+  // }
 
   // signUp(email: string, password: string): Observable<AuthResponse> {
   //   return this.sendSignUpRequest({ email: email, password: password })

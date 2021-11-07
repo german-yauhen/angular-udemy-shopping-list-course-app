@@ -27,7 +27,14 @@ export class AuthEffects {
     ofType(AuthActions.LOGIN_START),
     switchMap((authData: AuthActions.LoginStart) => {
       return this.authService.sendLoginRequest(authData.payload)
-        .pipe(map(this.handleAuthFunc), catchError(this.handleError))
+        .pipe(
+          tap(authResponse => {
+            const expirationMs: number = Number.parseInt(authResponse.expiresIn) * 1000;
+            this.authService.setAutoLogoutTimer(expirationMs);
+          }),
+          map(this.handleAuth),
+          catchError(this.handleError)
+        )
     })
   );
 
@@ -36,7 +43,14 @@ export class AuthEffects {
     ofType(AuthActions.SIGNUP_START),
     switchMap((authData: AuthActions.SignUpStart) => {
       return this.authService.sendSignUpRequest(authData.payload)
-        .pipe(map(this.handleAuthFunc), catchError(this.handleError))
+        .pipe(
+          tap(authResponse => {
+            const expirationMs: number = Number.parseInt(authResponse.expiresIn) * 1000;
+            this.authService.setAutoLogoutTimer(expirationMs);
+          }),
+          map(this.handleAuth),
+          catchError(this.handleError)
+        )
     })
   );
 
@@ -51,6 +65,7 @@ export class AuthEffects {
     ofType(AuthActions.LOGOUT),
     tap(() => {
       localStorage.removeItem('userData');
+      this.authService.clearAutoLogoutTimer();
       this.authService.navigateLogout();
     })
   );
@@ -58,15 +73,41 @@ export class AuthEffects {
   @Effect({ dispatch: true })
   autoLogin = this.actions.pipe(
     ofType(AuthActions.AUTO_LOGIN),
-    map(() => this.handleAutoLogin())
+    map(() => this.readUser()),
+    tap(userDataObj => {
+      const expiration: number = this.getExpiration(userDataObj);
+      if (expiration) {
+        this.authService.setAutoLogoutTimer(expiration);
+      }
+    }),
+    map(userDataObj => this.handleAutoLogin(userDataObj))
   );
 
-  private handleAutoLogin(): AuthActions.Login | AuthActions.NoAutoLogin {
+  private getExpiration(userDataObj: { email: string, id: string, _token: string, _tokenExpirationDate: string }): number {
+    if (!userDataObj || !userDataObj._tokenExpirationDate) {
+      return null;
+    }
+    const expirationDate: Date = new Date(userDataObj._tokenExpirationDate);
+    const currentDate: Date = new Date();
+    if (currentDate < expirationDate) {
+      return expirationDate.getTime() - currentDate.getTime();
+    } else {
+      return null;
+    }
+  }
+
+  private readUser(): { email: string, id: string, _token: string, _tokenExpirationDate: string } {
     const userData: string = localStorage.getItem('userData');
     if (!userData) {
+      return null;
+    }
+    return JSON.parse(userData);
+  }
+
+  private handleAutoLogin(userDataObj: { email: string, id: string, _token: string, _tokenExpirationDate: string }): AuthActions.Login | AuthActions.NoAutoLogin {
+    if (!userDataObj) {
       return new AuthActions.NoAutoLogin();
     }
-    const userDataObj: { email: string, id: string, _token: string, _tokenExpirationDate: string } = JSON.parse(userData);
     const expDate: Date = new Date(userDataObj._tokenExpirationDate);
     const loadedUser: User = new User(userDataObj.email, userDataObj.id, userDataObj._token, expDate);
     if (loadedUser.token) {
@@ -77,8 +118,9 @@ export class AuthEffects {
     return new AuthActions.NoAutoLogin();
   }
 
-  private handleAuthFunc(rsData: AuthResponse): AuthActions.Login {
-    const expirationDate: Date = new Date(new Date().getTime() + (Number.parseInt(rsData.expiresIn) * 1000));
+  private handleAuth(rsData: AuthResponse): AuthActions.Login {
+    const expirationMs: number = Number.parseInt(rsData.expiresIn) * 1000;
+    const expirationDate: Date = new Date(new Date().getTime() + expirationMs);
     const newUser: User = new User(rsData.email, rsData.localId, rsData.idToken, expirationDate);
     localStorage.setItem('userData', JSON.stringify(newUser));
     return new AuthActions.Login(
@@ -101,7 +143,6 @@ export class AuthEffects {
       case 'TOO_MANY_ATTEMPTS_TRY_LATER':
         errorMessage = 'We have blocked all requests from this device due to unusual activity. Try again later';
         break;
-
       case 'EMAIL_NOT_FOUND':
         errorMessage = 'There is no user associated with provided email address. The user may have been deleted';
         break;
